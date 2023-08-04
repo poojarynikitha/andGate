@@ -26,3 +26,25 @@ endgroup
    //Creating the object for covergroup
     drv_cg=new();
   endfunction
+  
+   task start();
+   @(vif.drv_cb);
+    for(int i=0;i<`no_of_trans;i++)
+      begin
+        drv_trans=new();
+       //Getting the transaction from generator
+        mbx_gd.get(drv_trans);
+         vif.drv_cb.a<=drv_trans.a;
+               vif.drv_cb.b<=drv_trans.b;
+        $display("DRIVER A DRIVING DATA TO THE INTERFACE a=%d,b=%d,",vif.drv_cb.a,vif.drv_cb.b,$time); 
+               vif.drv_cb.a<=0;
+               //Putting the randomized inputs to mailbox    
+               mbx_dr.put(drv_trans);
+               //Sampling the covergroup
+               drv_cg.sample();
+               $display("INPUT FUNCTIONAL COVERAGE = %0d", drv_cg.get_coverage());
+        end
+     end
+  endtask
+endclass
+
